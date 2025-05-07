@@ -18,10 +18,37 @@ import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
 fun Application.configureSecurity() {
-    authentication {
+
+    install(Authentication) {
+        jwt("admin") {
+            realm = "ktor"
+            verifier(JwtConfig.verifier)
+            validate { credential ->
+                if (credential.payload.getClaim("id").asInt() != null) {
+                    if (credential.payload.getClaim("role").asString() == "admin") {
+                        JWTPrincipal(credential.payload)
+                    } else {
+                        null
+                    }
+                } else {
+                    null
+                }
+            }
+        }
+        jwt("user") {
+            realm = "ktor"
+            verifier(JwtConfig.verifier)
+            validate { credential ->
+                if (credential.payload.getClaim("id").asInt() != null) {
+                    JWTPrincipal(credential.payload)
+                } else {
+                    null
+                }
+            }
+        }
         jwt {
-            realm = "ktproject" // Убедитесь, что совпадает с тем, что в токене
-            verifier(JwtConfig.verifier)  // Проверка токена
+            realm = "ktor"
+            verifier(JwtConfig.verifier)
             validate { credential ->
                 if (credential.payload.getClaim("id").asInt() != null) {
                     JWTPrincipal(credential.payload)
@@ -31,4 +58,15 @@ fun Application.configureSecurity() {
             }
         }
     }
+
+//
+//    authentication {
+//        jwt {
+//            realm = "ktproject" // Убедитесь, что совпадает с тем, что в токене
+//            verifier(JwtConfig.verifier)  // Проверка токена
+//            validate { credential ->
+//
+//            }
+//        }
+//    }
 }

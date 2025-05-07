@@ -2,6 +2,9 @@ package com.ktproject
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.ktproject.models.News
+import com.ktproject.models.Requests
+import com.ktproject.models.Services
 import com.ktproject.models.Users
 import com.ktproject.services.ExposedUser
 import com.ktproject.services.UserService
@@ -20,12 +23,18 @@ import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
-fun Application.configureDatabases() {
+fun Application.configureDatabases(): Database {
     val database = Database.connect( // &createDatabaseIfNotExist=true
-        url = "jdbc:mysql://localhost:3306/ktproject?useSSL=false&serverTimezone=UTC",
-        driver = "com.mysql.cj.jdbc.Driver",
+        url = "jdbc:mariadb://localhost:3306/ktproject?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&autoReconnect=true",
+        driver = "org.mariadb.jdbc.Driver",
         user = "ktproj",
         password = "passwd\$kT"
     )
+//    url = "jdbc:mysql://localhost:3306/ktproject?useSSL=false&serverTimezone=UTC",
+//    driver = "com.mysql.cj.jdbc.Driver",
+    transaction {
+        SchemaUtils.drop(Requests, News, Services, Users)
+    }
 
+    return database
 }

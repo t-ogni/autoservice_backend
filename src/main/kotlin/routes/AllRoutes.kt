@@ -17,11 +17,7 @@ import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.put
-import io.ktor.server.routing.routing
+import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.Database
 
 fun Application.configureRoutes(database: Database) {
@@ -31,14 +27,17 @@ fun Application.configureRoutes(database: Database) {
     val userService = UserService(database)
 
     routing {
-        authenticate {
-            // Create user
+
+        authenticate("admin") {
+            // Create user (только для админов)
             post("/users") {
                 val user = call.receive<ExposedUser>()
                 val id = userService.create(user)
                 call.respond(HttpStatusCode.Created, id)
             }
+        }
 
+        authenticate {
             get("/users") {
                 val id = userService.readAll()
                 call.respond(HttpStatusCode.OK, id)
@@ -55,18 +54,38 @@ fun Application.configureRoutes(database: Database) {
                 }
             }
 
-            // Update user
             put("/users/{id}") {
-                val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
+                val principal = call.principal<JWTPrincipal>()
+                    ?: return@put call.respond(HttpStatusCode.Unauthorized, "User not authenticated")
+
+                val userIdFromToken = principal.payload.getClaim("id").asInt()
+                val userRole = principal.payload.getClaim("role").asString()
+
+                val idParam = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
+
+                if (userRole != "admin" && userIdFromToken != idParam) {
+                    return@put call.respond(HttpStatusCode.Forbidden, "You can only update your own account")
+                }
+
                 val fieldUpdates = call.receive<Map<String, Any>>()
-                userService.updatePartial(id, fieldUpdates)
+                userService.updatePartial(idParam, fieldUpdates)
                 call.respond(HttpStatusCode.OK)
             }
 
             // Delete user
             delete("/users/{id}") {
-                val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
-                userService.delete(id)
+                val principal = call.principal<JWTPrincipal>()
+                    ?: return@delete call.respond(HttpStatusCode.Unauthorized, "User not authenticated")
+
+                val userIdFromToken = principal.payload.getClaim("id").asInt()
+                val userRole = principal.payload.getClaim("role").asString()
+
+                val idParam = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
+
+                if (userRole != "admin" && userIdFromToken != idParam) {
+                    return@delete call.respond(HttpStatusCode.Forbidden, "You can only delete your own account")
+                }
+                userService.delete(idParam)
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -140,7 +159,6 @@ fun Application.configureRoutes(database: Database) {
                 val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
                 val updatedNews = call.receive<ExposedNews>()
 
-                // Мы не обновляем id, только другие поля
                 newsService.updateNews(id, updatedNews.title, updatedNews.content, updatedNews.date)
 
                 call.respond(HttpStatusCode.OK)
@@ -150,6 +168,12 @@ fun Application.configureRoutes(database: Database) {
 
         get("/news") {
             val news = newsService.readAll()
+            call.respond(news)
+        }
+
+        get("/news/{id}") {
+            val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
+            val news = newsService.read(id)
             call.respond(news)
         }
     }

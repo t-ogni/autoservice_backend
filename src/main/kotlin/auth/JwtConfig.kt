@@ -9,7 +9,7 @@ object JwtConfig {
     private const val secret = "your_jwt_secret"
     private const val issuer = "ktor-autoservice"
     private const val audience = "ktor-users"
-    private const val validityInMs = 36_000_00 * 24 // 24 часа
+    private const val validityInMs = 36_000_00L * 24 * 30  // 30 суток
 
     private val algorithm = Algorithm.HMAC256(secret)
 

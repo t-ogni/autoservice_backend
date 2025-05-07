@@ -1,7 +1,5 @@
 package com.ktproject
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -26,5 +24,6 @@ fun Application.configureSerialization() {
         get("/json/kotlinx-serialization") {
             call.respond(mapOf("hello" to "world"))
         }
+
     }
 }

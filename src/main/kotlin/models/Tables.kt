@@ -1,5 +1,6 @@
 package com.ktproject.models
 
+import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 
 object Users : Table() {
@@ -19,20 +20,20 @@ object Services : Table() {
     val price = double("price")
     val description = text("description")
 
-    override val primaryKey = PrimaryKey(Users.id)
+    override val primaryKey = PrimaryKey(id)
 }
 
 object Requests : Table() {
     val id = integer("id").autoIncrement()
-    val userId = integer("user_id").references(Users.id)
-    val serviceId = integer("service_id").references(Services.id)
+    val userId = integer("user_id").references(Users.id, onDelete = ReferenceOption.CASCADE)
+    val serviceId = integer("service_id").references(Services.id, onDelete = ReferenceOption.CASCADE)
     val date = varchar("date", 255)
     val carBrand = varchar("car_brand", 255)
     val customerComment = text("customer_comment")
     val status = varchar("status", 255)
     val result = text("result").nullable()
 
-    override val primaryKey = PrimaryKey(Users.id)
+    override val primaryKey = PrimaryKey(id)
 }
 
 object News : Table() {
@@ -41,5 +42,5 @@ object News : Table() {
     val content = text("content")
     val date = varchar("date", 255)
 
-    override val primaryKey = PrimaryKey(Users.id)
+    override val primaryKey = PrimaryKey(id)
 }

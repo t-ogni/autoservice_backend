@@ -30,7 +30,6 @@ class UserService(database: Database) {
 
     init {
         transaction(database) {
-            SchemaUtils.drop(Users)     // удалит таблицу Users
             SchemaUtils.create(Users)
         }
     }

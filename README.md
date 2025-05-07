@@ -28,10 +28,10 @@ Here's a list of features included in this project:
 To build or run the project, use one of the following tasks:
 
 | Task                          | Description                                                          |
-| -------------------------------|---------------------------------------------------------------------- |
+|-------------------------------|--------------------------------------------------------------------- |
 | `./gradlew test`              | Run the tests                                                        |
 | `./gradlew build`             | Build everything                                                     |
-| `buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
+| `./gradlew buildFatJar`       | Build an executable JAR of the server with all dependencies included |
 | `buildImage`                  | Build the docker image to use with the fat JAR                       |
 | `publishImageToLocalRegistry` | Publish the docker image locally                                     |
 | `run`                         | Run the server                                                       |
@@ -44,3 +44,25 @@ If the server starts successfully, you'll see the following output:
 2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
 ```
 
+
+Метод  | Путь | Описание | Кто имеет доступ
+POST   | /register | Регистрация нового пользователя (роль — user) | Все
+POST   | /login | Авторизация пользователя, выдача JWT | Все
+POST   | /logout | (Новый!) Инвалидировать токен / очистить токен | Аутентифицированный
+GET    | /users | Получить список всех пользователей | Любой авторизованный
+GET    | /users/{id} | Получить пользователя по ID | Любой авторизованный
+POST   | /users | Создать пользователя вручную (через админ-панель) | Только админ
+PUT    | /users/{id} | Обновить пользователя | Пользователь (свою) или админ (любую)
+DELETE | /users/{id} | Удалить пользователя | Пользователь (свою) или админ (любую)
+GET    | /services | Получить все услуги | Все
+POST   | /services | Добавить услугу |    Только админ
+DELETE | /services/{id} | Удалить услугу | Только админ
+POST   | /requests | Создать заявку | Любой авторизованный
+GET    | /requests/mine | Получить свои заявки | Пользователь
+GET    | /requests | Получить все заявки | Только админ
+PUT    | /requests/{id} | Обновить заявку (статус, результат) | Только админ
+GET    | /news | Получить все новости | Все
+GET    | /news/{id} | Получить новость по ID | Все
+POST   | /news | Создать новость | Только админ
+PUT    | /news/{id} | Обновить новость | Только админ
+DELETE | /news/{id} | Удалить новость | Только админ
