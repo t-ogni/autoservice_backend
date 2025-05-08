@@ -24,15 +24,17 @@ import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
 fun Application.configureDatabases(): Database {
-    val database = Database.connect( // &createDatabaseIfNotExist=true
-        url = "jdbc:mariadb://localhost:3306/ktproject?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&autoReconnect=true",
+    val database = Database.connect( // &createDatabaseIfNotExist=true &createDatabaseIfNotExist=true&autoReconnect=true
+        url = "jdbc:mariadb://0.0.0.0:3306/ktproject?useSSL=false&serverTimezone=UTC",
         driver = "org.mariadb.jdbc.Driver",
         user = "ktproj",
         password = "passwd\$kT"
     )
 //    url = "jdbc:mysql://localhost:3306/ktproject?useSSL=false&serverTimezone=UTC",
 //    driver = "com.mysql.cj.jdbc.Driver",
+
     transaction {
+        addLogger(StdOutSqlLogger)
         SchemaUtils.drop(Requests, News, Services, Users)
     }
 

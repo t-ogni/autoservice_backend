@@ -24,6 +24,5 @@ fun Application.configureSerialization() {
         get("/json/kotlinx-serialization") {
             call.respond(mapOf("hello" to "world"))
         }
-
     }
 }

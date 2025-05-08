@@ -1,0 +1,181 @@
+###
+# Переменные окружения
+@baseUrl = http://localhost:8080
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBdXRoZW50aWNhdGlvbiIsImlzcyI6Imt0b3ItYXV0b3NlcnZpY2UiLCJhdWQiOiJrdG9yLXVzZXJzIiwiaWQiOjEsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc0ODE4MzMyN30.h3pzbNKc2gLyRdQtZx5-8X5O55mtmwQ4pGkDiFsMiKg
+@userToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBdXRoZW50aWNhdGlvbiIsImlzcyI6Imt0b3ItYXV0b3NlcnZpY2UiLCJhdWQiOiJrdG9yLXVzZXJzIiwiaWQiOjIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzQ4MTgzMTI4fQ.WriP55RRhcjKQ4rT1WJFoedVWWnZo4E3WnJn1lKA99o
+
+###
+# Регистрация и авторизация пользователя
+###
+
+### Регистрация нового пользователя
+# @name register
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "name": "Тестовый Пользователь",
+  "email": "user_test@example.com",
+  "password": "password123",
+  "phone": "+7 900 123 4567"
+}
+
+### Авторизация пользователя
+# @name login
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "user_test@example.com",
+  "password": "password123"
+}
+
+###
+# Публичные запросы (не требуют авторизации)
+###
+
+### Получение списка всех услуг
+GET {{baseUrl}}/services
+Accept: application/json
+
+### Получение услуги по ID (существующая)
+GET {{baseUrl}}/services/1
+Accept: application/json
+
+### Получение услуги по ID (несуществующая)
+GET {{baseUrl}}/services/999
+Accept: application/json
+
+### Получение услуги с некорректным ID
+GET {{baseUrl}}/services/invalid
+Accept: application/json
+
+###
+# Запросы с авторизацией пользователя (проверка разграничения доступа)
+###
+
+### Попытка создания новой услуги обычным пользователем (должно вернуть ошибку доступа)
+POST {{baseUrl}}/services
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "title": "Попытка создания пользователем",
+  "description": "Тест разграничения доступа",
+  "price": "1000"
+}
+
+### Попытка обновления услуги обычным пользователем (должно вернуть ошибку доступа)
+PUT {{baseUrl}}/services/1
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "title": "Попытка обновления пользователем",
+  "description": "Тест разграничения доступа",
+  "price": "1000"
+}
+
+### Попытка удаления услуги обычным пользователем (должно вернуть ошибку доступа)
+DELETE {{baseUrl}}/services/2
+Authorization: Bearer {{userToken}}
+
+###
+# Запросы с авторизацией администратора
+###
+
+### Авторизация администратора (получение токена)
+# @name adminLogin
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "sa@example.com",
+  "password": "admin123"
+}
+
+
+### Создание новой услуги
+POST {{baseUrl}}/services
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Замена масла",
+  "description": "Замена масла в двигателе и масляного фильтра",
+  "price": "2500"
+}
+
+### Создание новой услуги с неполными данными
+POST {{baseUrl}}/services
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Замена фильтра",
+  "price": "1000"
+}
+
+### Обновление существующей услуги
+PUT {{baseUrl}}/services/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Обновленная услуга",
+  "description": "Новое описание услуги",
+  "price": "3000"
+}
+
+### Частичное обновление услуги (только цена)
+PUT {{baseUrl}}/services/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "price": "3500"
+}
+
+### Обновление несуществующей услуги
+PUT {{baseUrl}}/services/999
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Несуществующая услуга",
+  "description": "Описание",
+  "price": "1000"
+}
+
+### Обновление услуги с некорректным ID
+PUT {{baseUrl}}/services/invalid
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Некорректный ID",
+  "description": "Описание",
+  "price": "1000"
+}
+
+### Удаление существующей услуги
+DELETE {{baseUrl}}/services/2
+Authorization: Bearer {{adminToken}}
+
+### Удаление несуществующей услуги
+DELETE {{baseUrl}}/services/999
+Authorization: Bearer {{adminToken}}
+
+### Удаление услуги с некорректным ID
+DELETE {{baseUrl}}/services/invalid
+Authorization: Bearer {{adminToken}}
+
+### Попытка доступа к защищенным ресурсам без авторизации
+POST {{baseUrl}}/services
+Content-Type: application/json
+
+{
+  "title": "Тест без авторизации",
+  "description": "Описание",
+  "price": "1000"
+}

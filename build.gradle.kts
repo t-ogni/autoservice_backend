@@ -2,6 +2,7 @@ val exposed_version: String by project
 val koin_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
+val ktor_version: String by project
 
 plugins {
     kotlin("jvm") version "2.1.10"
@@ -14,7 +15,6 @@ version = "0.0.1"
 
 application {
     mainClass = "io.ktor.server.netty.EngineMain"
-
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
@@ -29,10 +29,15 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt")
     implementation("io.ktor:ktor-server-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json")
-    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
-    implementation("mysql:mysql-connector-java:8.0.33")
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.3")
+//    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
+//    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
+//    implementation("mysql:mysql-connector-java:8.0.33")
+//    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.3")
+
+    implementation("org.jetbrains.exposed:exposed-core:0.48.0")
+    implementation("org.jetbrains.exposed:exposed-dao:0.48.0")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.48.0")
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.3.2")
 
     // implementation("io.ktor:ktor-server-html-builder:2.2.4")
 

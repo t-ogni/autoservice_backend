@@ -1,0 +1,111 @@
+###
+# Переменные окружения
+@baseUrl = http://localhost:8080
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBdXRoZW50aWNhdGlvbiIsImlzcyI6Imt0b3ItYXV0b3NlcnZpY2UiLCJhdWQiOiJrdG9yLXVzZXJzIiwiaWQiOjEsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc0ODE4MzMyN30.h3pzbNKc2gLyRdQtZx5-8X5O55mtmwQ4pGkDiFsMiKg
+@userToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBdXRoZW50aWNhdGlvbiIsImlzcyI6Imt0b3ItYXV0b3NlcnZpY2UiLCJhdWQiOiJrdG9yLXVzZXJzIiwiaWQiOjIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzQ4MTgzMTI4fQ.WriP55RRhcjKQ4rT1WJFoedVWWnZo4E3WnJn1lKA99o
+
+###
+# Регистрация и авторизация пользователя
+###
+
+### Регистрация нового пользователя
+# @name userRegister
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "name": "Петр Петров",
+  "email": "petr@example.com",
+  "password": "password123",
+  "phone": "+7 900 800 7000"
+}
+
+### Авторизация пользователя
+# @name userLogin
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "petr@example.com",
+  "password": "password123"
+}
+
+### Авторизация администратора
+# @name adminLogin
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin_password"
+}
+
+
+###
+# Запросы для работы с заявками на обслуживание
+###
+
+### Создание новой заявки пользователем
+POST {{baseUrl}}/requests
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "serviceId": 1,
+  "date": "2023-05-20",
+  "carModel": "Camry",
+  "carBrand": "Toyota",
+  "customerComment": "Необходимо заменить масло в двигателе"
+}
+
+### Получение списка всех заявок пользователем
+GET {{baseUrl}}/my_requests
+Authorization: Bearer {{userToken}}
+
+### Получение списка всех заявок администратором
+GET {{baseUrl}}/requests
+Authorization: Bearer {{adminToken}}
+
+### Получение конкретной заявки
+GET {{baseUrl}}/requests/1
+Authorization: Bearer {{userToken}}
+
+### Получение заявок пользователя
+GET {{baseUrl}}/requests/
+Authorization: Bearer {{userToken}}
+
+### Обновление статуса заявки администратором
+PUT {{baseUrl}}/requests/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "в обработке"
+}
+
+### Попытка обновления статуса заявки пользователем (должно вернуть ошибку доступа)
+PUT {{baseUrl}}/requests/1
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "status": "в обработке"
+}
+
+### Завершение заявки с результатом администратором
+PUT {{baseUrl}}/requests/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "status": "выполнена",
+  "result": "Произведена замена масла Castrol Edge 5W-30 и оригинального масляного фильтра"
+}
+
+### Отмена заявки пользователем
+DELETE {{baseUrl}}/requests/2
+Authorization: Bearer {{userToken}}
+
+### Попытка отмены чужой заявки пользователем (должно вернуть ошибку)
+DELETE {{baseUrl}}/requests/3
+Authorization: Bearer {{userToken}}

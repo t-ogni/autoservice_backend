@@ -1,102 +1,110 @@
 package com.ktproject.services
 
-import com.ktproject.models.Requests
-import com.ktproject.models.Services
-import com.ktproject.models.Users
-import com.ktproject.models.Users.email
-import com.ktproject.models.Users.passwordHash
-import com.ktproject.models.Users.phone
-import com.ktproject.models.Users.role
+import com.ktproject.models.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.Serializable
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.name
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 
 @Serializable
 data class ExposedRequest(
-    val id: Int,  // Добавим id
+    val id: Int,
     val userId: Int,
     val serviceId: Int,
-    val date: String, // Для простоты, допустим, что дата передается как строка
+    val date: String,
+    val carModel: String,
     val carBrand: String,
     val customerComment: String,
     val status: String,
     val result: String? = null
 )
 
-class RequestService(database: Database) {
+class RequestService(private val database: Database) {
 
     init {
         transaction(database) {
-            SchemaUtils.create(Requests) // создаем таблицу для заявок
+            SchemaUtils.create(Requests)
         }
     }
 
-    suspend fun create(request: ExposedRequest): Int = dbQuery {
+    suspend fun createFromRequest(request: AddRequestRequest): Int = dbQuery {
         Requests.insert {
             it[userId] = request.userId
             it[serviceId] = request.serviceId
             it[date] = request.date
+            it[carModel] = request.carModel
             it[carBrand] = request.carBrand
             it[customerComment] = request.customerComment
             it[status] = request.status
-            it[result] = request.result
+            it[result] = null
         }[Requests.id]
     }
 
-    suspend fun readByUser(userId: Int): List<ExposedRequest> {
-        return dbQuery {
-            Requests.selectAll().where { Requests.userId eq userId }
-                .map {
-                    ExposedRequest(
-                        it[Requests.id],
-                        it[Requests.userId],
-                        it[Requests.serviceId],
-                        it[Requests.date],
-                        it[Requests.carBrand],
-                        it[Requests.customerComment],
-                        it[Requests.status],
-                        it[Requests.result]
-                    )
-                }
-        }
-    }
-
-    suspend fun readAll(): List<ExposedRequest> {
-        return dbQuery {
-            Requests.selectAll()
-                .map {
-                    ExposedRequest(
-                        it[Requests.id],
-                        it[Requests.userId],
-                        it[Requests.serviceId],
-                        it[Requests.date],
-                        it[Requests.carBrand],
-                        it[Requests.customerComment],
-                        it[Requests.status],
-                        it[Requests.result]
-                    )
-                }
-        }
-    }
-
-    suspend fun updateStatus(id: Int, status: String, result: String?) {
-        dbQuery {
-            Requests.update({ Requests.id eq id }) {
-                it[this.status] = status
-                it[this.result] = result
+    suspend fun read(id: Int): ExposedRequest? = dbQuery {
+        Requests.select(Requests.id.eq(id))
+            .map { row ->
+                ExposedRequest(
+                    id = row[Requests.id],
+                    userId = row[Requests.userId],
+                    serviceId = row[Requests.serviceId],
+                    date = row[Requests.date],
+                    carModel = row[Requests.carModel],
+                    carBrand = row[Requests.carBrand],
+                    customerComment = row[Requests.customerComment],
+                    status = row[Requests.status],
+                    result = row[Requests.result]
+                )
             }
-        }
+            .singleOrNull()
+    }
+
+    suspend fun readAll(): List<ExposedRequest> = dbQuery {
+        Requests.selectAll()
+            .map { row ->
+                ExposedRequest(
+                    id = row[Requests.id],
+                    userId = row[Requests.userId],
+                    serviceId = row[Requests.serviceId],
+                    date = row[Requests.date],
+                    carModel = row[Requests.carModel],
+                    carBrand = row[Requests.carBrand],
+                    customerComment = row[Requests.customerComment],
+                    status = row[Requests.status],
+                    result = row[Requests.result]
+                )
+            }
+    }
+
+    suspend fun readByUser(userId: Int): List<ExposedRequest> = dbQuery {
+        Requests.select(Requests.userId.eq(userId))
+            .map { row ->
+                ExposedRequest(
+                    id = row[Requests.id],
+                    userId = row[Requests.userId],
+                    serviceId = row[Requests.serviceId],
+                    date = row[Requests.date],
+                    carModel = row[Requests.carModel],
+                    carBrand = row[Requests.carBrand],
+                    customerComment = row[Requests.customerComment],
+                    status = row[Requests.status],
+                    result = row[Requests.result]
+                )
+            }
+    }
+
+    suspend fun updateStatus(id: Int, status: String, result: String?): Boolean = dbQuery {
+        Requests.update({ Requests.id.eq(id) }) { row ->
+            row[Requests.status] = status
+            result?.let { row[Requests.result] = result }
+        } > 0
+    }
+
+    suspend fun delete(id: Int): Boolean = dbQuery {
+        Requests.deleteWhere(op = { Requests.id eq id }) > 0
     }
 
     private suspend fun <T> dbQuery(block: suspend () -> T): T =
-        newSuspendedTransaction(Dispatchers.IO) { block() }
+        newSuspendedTransaction(Dispatchers.IO, database) { block() }
 }

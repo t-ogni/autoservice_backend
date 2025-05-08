@@ -7,7 +7,7 @@ object Users : Table() {
     val id = integer("id").autoIncrement()
     val name = varchar("name", 50)
     val email = varchar("email", 50).uniqueIndex()
-    val passwordHash = varchar("password", 64)
+    val passwordHash = varchar("passwordHash", 128) // Увеличиваем длину для хеша BCrypt
     val phone = varchar("phone", 20).default("")
     val role = varchar("role", 10).default("user") // user / admin
 
@@ -17,8 +17,8 @@ object Users : Table() {
 object Services : Table() {
     val id = integer("id").autoIncrement()
     val name = varchar("name", 255)
-    val price = double("price")
     val description = text("description")
+    val price = double("price")
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -27,10 +27,11 @@ object Requests : Table() {
     val id = integer("id").autoIncrement()
     val userId = integer("user_id").references(Users.id, onDelete = ReferenceOption.CASCADE)
     val serviceId = integer("service_id").references(Services.id, onDelete = ReferenceOption.CASCADE)
-    val date = varchar("date", 255)
+    val date = varchar("date", 20) // Формат YYYY-MM-DD
     val carBrand = varchar("car_brand", 255)
+    val carModel = varchar("car_model", 255)
     val customerComment = text("customer_comment")
-    val status = varchar("status", 255)
+    val status = varchar("status", 50).default("новая")
     val result = text("result").nullable()
 
     override val primaryKey = PrimaryKey(id)
@@ -40,7 +41,7 @@ object News : Table() {
     val id = integer("id").autoIncrement()
     val title = varchar("title", 255)
     val content = text("content")
-    val date = varchar("date", 255)
+    val date = varchar("date", 20) // Формат YYYY-MM-DD
 
     override val primaryKey = PrimaryKey(id)
 }

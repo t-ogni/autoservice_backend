@@ -12,6 +12,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import models.responseError
 import org.jetbrains.exposed.sql.*
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
@@ -34,6 +35,9 @@ fun Application.configureSecurity() {
                     null
                 }
             }
+            challenge { _, _ ->
+                call.responseError( "У вас нет прав администратора для доступа к этому ресурсу", HttpStatusCode.Unauthorized)
+            }
         }
         jwt("user") {
             realm = "ktor"
@@ -44,6 +48,9 @@ fun Application.configureSecurity() {
                 } else {
                     null
                 }
+            }
+            challenge { _, _ ->
+                call.responseError("Требуется аутентификация", HttpStatusCode.Unauthorized)
             }
         }
         jwt {
@@ -56,17 +63,9 @@ fun Application.configureSecurity() {
                     null
                 }
             }
+            challenge { _, _ ->
+                call.responseError("Требуется аутентификация", HttpStatusCode.Unauthorized)
+            }
         }
     }
-
-//
-//    authentication {
-//        jwt {
-//            realm = "ktproject" // Убедитесь, что совпадает с тем, что в токене
-//            verifier(JwtConfig.verifier)  // Проверка токена
-//            validate { credential ->
-//
-//            }
-//        }
-//    }
 }

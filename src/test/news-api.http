@@ -1,0 +1,116 @@
+###
+# Переменные окружения
+@baseUrl = http://localhost:8080
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBdXRoZW50aWNhdGlvbiIsImlzcyI6Imt0b3ItYXV0b3NlcnZpY2UiLCJhdWQiOiJrdG9yLXVzZXJzIiwiaWQiOjEsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc0ODE4MzMyN30.h3pzbNKc2gLyRdQtZx5-8X5O55mtmwQ4pGkDiFsMiKg
+@userToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBdXRoZW50aWNhdGlvbiIsImlzcyI6Imt0b3ItYXV0b3NlcnZpY2UiLCJhdWQiOiJrdG9yLXVzZXJzIiwiaWQiOjIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzQ4MTgzMTI4fQ.WriP55RRhcjKQ4rT1WJFoedVWWnZo4E3WnJn1lKA99o
+
+###
+# Регистрация и авторизация пользователя
+###
+
+### Регистрация нового пользователя
+# @name userRegister
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "name": "Пользователь Новостей",
+  "email": "news_user@example.com",
+  "password": "password123",
+  "phone": "+7 999 777 5555"
+}
+
+### Авторизация пользователя
+# @name userLogin
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "news_user@example.com",
+  "password": "password123"
+}
+
+###
+# Запросы для работы с новостями
+###
+
+### Получение списка всех новостей (публичный доступ)
+GET {{baseUrl}}/news
+Accept: application/json
+
+### Получение конкретной новости по ID
+GET {{baseUrl}}/news/1
+Accept: application/json
+
+###
+# Проверка ограничений доступа с токеном пользователя
+###
+
+### Попытка создания новой новости обычным пользователем (должно вернуть ошибку доступа)
+POST {{baseUrl}}/news
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "title": "Попытка создания пользователем",
+  "content": "Это сообщение не должно быть создано из-за ограничений доступа",
+  "date": "2023-05-25"
+}
+
+### Попытка обновления новости обычным пользователем (должно вернуть ошибку доступа)
+PUT {{baseUrl}}/news/1
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "title": "Попытка обновления пользователем",
+  "content": "Это сообщение не должно быть обновлено из-за ограничений доступа",
+  "date": "2023-05-26"
+}
+
+### Попытка удаления новости обычным пользователем (должно вернуть ошибку доступа)
+DELETE {{baseUrl}}/news/2
+Authorization: Bearer {{userToken}}
+
+###
+# Запросы с авторизацией администратора
+###
+
+### Авторизация администратора
+# @name adminLogin
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin_password"
+}
+
+# Установим adminToken из ответа, если не указали вручную
+@dynamicAdminToken = {{adminLogin.response.body.$.data}}
+
+### Создание новой новости (требуется авторизация администратора)
+POST {{baseUrl}}/news
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Новая акция на диагностику",
+  "content": "С 1 июня по 31 августа действует специальное предложение на комплексную диагностику автомобиля. Подробности уточняйте у менеджеров.",
+  "date": "2023-05-25"
+}
+
+### Обновление существующей новости
+PUT {{baseUrl}}/news/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Обновленный заголовок новости",
+  "content": "Обновленное содержание новости с дополнительной информацией",
+  "date": "2023-05-26"
+}
+
+### Удаление новости
+DELETE {{baseUrl}}/news/2
+Authorization: Bearer {{adminToken}}

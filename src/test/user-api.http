@@ -1,0 +1,154 @@
+###
+# Переменные окружения
+@baseUrl = http://localhost:8080
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBdXRoZW50aWNhdGlvbiIsImlzcyI6Imt0b3ItYXV0b3NlcnZpY2UiLCJhdWQiOiJrdG9yLXVzZXJzIiwiaWQiOjEsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc0ODE4MzMyN30.h3pzbNKc2gLyRdQtZx5-8X5O55mtmwQ4pGkDiFsMiKg
+@userToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBdXRoZW50aWNhdGlvbiIsImlzcyI6Imt0b3ItYXV0b3NlcnZpY2UiLCJhdWQiOiJrdG9yLXVzZXJzIiwiaWQiOjIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzQ4MTgzMTI4fQ.WriP55RRhcjKQ4rT1WJFoedVWWnZo4E3WnJn1lKA99o
+
+###
+# Авторизация и регистрация
+###
+
+### Регистрация нового пользователя
+# @name register
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "name": "Иван Иванов",
+  "email": "ivan@example.com",
+  "password": "password123",
+  "phone": "+7 123 456 7890"
+}
+
+### Регистрация с существующим email
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "name": "Дубликат Пользователя",
+  "email": "ivan@example.com",
+  "password": "password123",
+  "phone": "+7 987 654 3210"
+}
+
+### Авторизация пользователя (обычного пользователя, не админа)
+# @name userLogin
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "ivan@example.com",
+  "password": "password123"
+}
+
+# Сохраняем полученный токен пользователя
+@userToken = {{userLogin.response.body.$.data}}
+
+### Авторизация с неверным паролем
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "ivan@example.com",
+  "password": "неверный_пароль"
+}
+
+### Авторизация с несуществующим email
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "несуществующий@example.com",
+  "password": "password123"
+}
+
+###
+# Проверка доступа к защищенным эндпоинтам обычным пользователем
+###
+
+### Попытка получения списка всех пользователей обычным пользователем
+GET {{baseUrl}}/users
+Authorization: Bearer {{userToken}}
+
+### Попытка получения информации о другом пользователе обычным пользователем
+GET {{baseUrl}}/users/1
+Authorization: Bearer {{userToken}}
+
+### Попытка создания нового пользователя обычным пользователем
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "name": "Попытка создания пользователем",
+  "email": "attempt@example.com",
+  "password": "password123",
+  "phone": "+7 111 111 1111",
+  "role": "user"
+}
+
+### Попытка обновления другого пользователя обычным пользователем
+PUT {{baseUrl}}/users/1
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "name": "Попытка обновления пользователем",
+  "phone": "+7 222 222 2222"
+}
+
+### Попытка удаления пользователя обычным пользователем
+DELETE {{baseUrl}}/users/3
+Authorization: Bearer {{userToken}}
+
+###
+# Операции с пользователями (требуют авторизации администратора)
+###
+
+### Авторизация администратора 
+# @name adminLogin
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin_password"
+}
+
+# Установим adminToken из ответа, если не указали вручную
+@dynamicAdminToken = {{adminLogin.response.body.$.data}}
+
+### Получение списка всех пользователей
+GET {{baseUrl}}/users
+Authorization: Bearer {{adminToken}}
+
+### Получение информации о конкретном пользователе
+GET {{baseUrl}}/users/1
+Authorization: Bearer {{adminToken}}
+
+### Создание нового пользователя администратором
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Новый Пользователь",
+  "email": "new_user@example.com",
+  "password": "password123",
+  "phone": "+7 111 222 3333",
+  "role": "user"
+}
+
+### Обновление пользователя
+PUT {{baseUrl}}/users/2
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Обновлённое Имя",
+  "phone": "+7 999 888 7777"
+}
+
+### Удаление пользователя
+DELETE {{baseUrl}}/users/3
+Authorization: Bearer {{adminToken}}
