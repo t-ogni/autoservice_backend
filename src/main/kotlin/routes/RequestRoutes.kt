@@ -23,7 +23,8 @@ fun Application.configureRequestRoutes(requestService: RequestService) {
                 
                 val request = call.receive<AddRequestRequest>()
                 val id = requestService.createFromRequest(request.copy(userId = userId))
-                call.responseSuccess(id, HttpStatusCode.Created)
+                val response = requestService.read(id)
+                call.responseSuccess(response, HttpStatusCode.Created)
             }
             
             // Получение списка своих заявок

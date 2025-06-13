@@ -18,6 +18,15 @@ data class ExposedUser(
     val role: String = "user"
 )
 
+@Serializable
+data class ExposedUserDTO(
+    val id: Int,
+    val name: String,
+    val email: String,
+    val phone: String,
+    val role: String
+)
+
 class UserService(private val database: Database) {
 
     init {
@@ -25,11 +34,11 @@ class UserService(private val database: Database) {
             SchemaUtils.create(Users)
 
             // Создаем суперадминистратора, если он не существует
-            val adminExists = Users.select(Users.email.eq("sa@example.com")).count() > 0
+            val adminExists = Users.select(Users.email.eq("sa")).count() > 0
             if (!adminExists) {
                 Users.insert {
                     it[name] = "Администратор"
-                    it[email] = "sa@example.com"
+                    it[email] = "sa"
                     it[passwordHash] = com.ktproject.routes.hashPassword("admin123")
                     it[role] = "admin"
                 }
@@ -47,14 +56,13 @@ class UserService(private val database: Database) {
         }[Users.id]
     }
 
-    suspend fun read(id: Int): ExposedUser? = dbQuery {
+    suspend fun read(id: Int): ExposedUserDTO? = dbQuery {
         Users.select(Users.id.eq(id))
             .map { row ->
-                ExposedUser(
+                ExposedUserDTO(
                     id = row[Users.id],
                     name = row[Users.name],
                     email = row[Users.email],
-                    passwordHash = row[Users.passwordHash],
                     phone = row[Users.phone],
                     role = row[Users.role]
                 )

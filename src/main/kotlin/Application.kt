@@ -5,6 +5,7 @@ import com.ktproject.services.NewsService
 import com.ktproject.services.RequestService
 import com.ktproject.services.ServicesService
 import com.ktproject.services.UserService
+//import configureRequestResponseLogging
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -43,7 +44,7 @@ fun Application.module() {
     // Конфигурация безопасности
     configureSecurity()
     configureSerialization()
-
+//    configureRequestResponseLogging()
 
     // Инициализация сервисов
     val userService = UserService(database)

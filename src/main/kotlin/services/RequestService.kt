@@ -13,6 +13,7 @@ data class ExposedRequest(
     val id: Int,
     val userId: Int,
     val serviceId: Int,
+    val time: String,
     val date: String,
     val carModel: String,
     val carBrand: String,
@@ -34,6 +35,7 @@ class RequestService(private val database: Database) {
             it[userId] = request.userId
             it[serviceId] = request.serviceId
             it[date] = request.date
+            it[time] = request.time
             it[carModel] = request.carModel
             it[carBrand] = request.carBrand
             it[customerComment] = request.customerComment
@@ -50,6 +52,7 @@ class RequestService(private val database: Database) {
                     userId = row[Requests.userId],
                     serviceId = row[Requests.serviceId],
                     date = row[Requests.date],
+                    time = row[Requests.time],
                     carModel = row[Requests.carModel],
                     carBrand = row[Requests.carBrand],
                     customerComment = row[Requests.customerComment],
@@ -68,6 +71,7 @@ class RequestService(private val database: Database) {
                     userId = row[Requests.userId],
                     serviceId = row[Requests.serviceId],
                     date = row[Requests.date],
+                    time = row[Requests.time],
                     carModel = row[Requests.carModel],
                     carBrand = row[Requests.carBrand],
                     customerComment = row[Requests.customerComment],
@@ -85,6 +89,7 @@ class RequestService(private val database: Database) {
                     userId = row[Requests.userId],
                     serviceId = row[Requests.serviceId],
                     date = row[Requests.date],
+                    time = row[Requests.time],
                     carModel = row[Requests.carModel],
                     carBrand = row[Requests.carBrand],
                     customerComment = row[Requests.customerComment],

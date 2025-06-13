@@ -14,7 +14,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 data class ExposedService(
     val id: Int,
     val name: String,
-    val price: Double,
+    val price: String,
     val description: String
 )
 
@@ -30,7 +30,7 @@ class ServicesService(private val database: Database) {
         Services.insert {
             it[name] = serviceRequest.title
             it[description] = serviceRequest.description
-            it[price] = serviceRequest.price.toDoubleOrNull() ?: 0.0
+            it[price] = serviceRequest.price
         }[Services.id]
     }
 
@@ -73,7 +73,7 @@ class ServicesService(private val database: Database) {
         Services.update({ Services.id.eq(id) }) { row ->
             updates.title?.let { row[Services.name] = it }
             updates.description?.let { row[Services.description] = it }
-            updates.price?.let { row[Services.price] = it.toDoubleOrNull() ?: service.price }
+            updates.price?.let { row[Services.price] = it }
         } > 0
     }
 

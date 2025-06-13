@@ -41,8 +41,6 @@ Content-Type: application/json
   "password": "password123"
 }
 
-# Сохраняем полученный токен пользователя
-@userToken = {{userLogin.response.body.$.data}}
 
 ### Авторизация с неверным паролем
 POST {{baseUrl}}/login

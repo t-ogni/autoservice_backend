@@ -35,7 +35,7 @@ fun Application.configureDatabases(): Database {
 
     transaction {
         addLogger(StdOutSqlLogger)
-        SchemaUtils.drop(Requests, News, Services, Users)
+//        SchemaUtils.drop(Requests, News, Services, Users)
     }
 
     return database

@@ -1,6 +1,6 @@
 ###
 # Переменные окружения
-@baseUrl = http://localhost:8080
+@baseUrl = http://localhost:8000
 @adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBdXRoZW50aWNhdGlvbiIsImlzcyI6Imt0b3ItYXV0b3NlcnZpY2UiLCJhdWQiOiJrdG9yLXVzZXJzIiwiaWQiOjEsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc0ODE4MzMyN30.h3pzbNKc2gLyRdQtZx5-8X5O55mtmwQ4pGkDiFsMiKg
 @userToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBdXRoZW50aWNhdGlvbiIsImlzcyI6Imt0b3ItYXV0b3NlcnZpY2UiLCJhdWQiOiJrdG9yLXVzZXJzIiwiaWQiOjIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzQ4MTgzMTI4fQ.WriP55RRhcjKQ4rT1WJFoedVWWnZo4E3WnJn1lKA99o
 

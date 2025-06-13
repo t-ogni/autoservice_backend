@@ -68,6 +68,9 @@ fun Application.configureAuthRoutes(database: Database, userService: UserService
 
             call.responseSuccess(TokenResponse(token, userId, "user"))
         }
+        get("/login") {
+            call.responseSuccess(TokenResponse("test-token", 1, "admin"))
+        }
 
         // Авторизация пользователя
         post("/login") {

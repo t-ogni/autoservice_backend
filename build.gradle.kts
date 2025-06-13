@@ -26,6 +26,7 @@ repositories {
 dependencies {
     implementation("io.ktor:ktor-server-core")
     implementation("io.ktor:ktor-server-auth")
+    implementation("io.ktor:ktor-server-call-logging")
     implementation("io.ktor:ktor-server-auth-jwt")
     implementation("io.ktor:ktor-server-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json")
@@ -47,7 +48,6 @@ dependencies {
     implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
     implementation("io.ktor:ktor-server-netty")
     implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("io.ktor:ktor-server-config-yaml")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }

@@ -21,7 +21,7 @@ fun Application.configureSerialization() {
     }
 
     routing {
-        get("/json/kotlinx-serialization") {
+        get("/") {
             call.respond(mapOf("hello" to "world"))
         }
     }

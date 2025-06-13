@@ -18,7 +18,7 @@ object Services : Table() {
     val id = integer("id").autoIncrement()
     val name = varchar("name", 255)
     val description = text("description")
-    val price = double("price")
+    val price = varchar("price", 255)
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -28,10 +28,11 @@ object Requests : Table() {
     val userId = integer("user_id").references(Users.id, onDelete = ReferenceOption.CASCADE)
     val serviceId = integer("service_id").references(Services.id, onDelete = ReferenceOption.CASCADE)
     val date = varchar("date", 20) // Формат YYYY-MM-DD
+    val time = varchar("time", 20)
     val carBrand = varchar("car_brand", 255)
     val carModel = varchar("car_model", 255)
     val customerComment = text("customer_comment")
-    val status = varchar("status", 50).default("новая")
+    val status = varchar("status", 50).default("wait")
     val result = text("result").nullable()
 
     override val primaryKey = PrimaryKey(id)

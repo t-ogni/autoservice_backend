@@ -51,11 +51,12 @@ data class UpdateServiceRequest(
 @Serializable
 data class AddRequestRequest(
     val serviceId: Int,
+    val time: String,
     val date: String,
     val carModel: String,
     val carBrand: String,
-    val customerComment: String,
-    val status: String = "новая",
+    val customerComment: String = "",
+    val status: String = "wait",
     val userId: Int = 0
 )
 

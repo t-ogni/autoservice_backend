@@ -4,6 +4,7 @@ import com.ktproject.models.AddUserRequest
 import com.ktproject.models.UpdateUserRequest
 import com.ktproject.models.toMap
 import com.ktproject.services.UserService
+import com.ktproject.services.ExposedUserDTO
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -16,9 +17,28 @@ import models.responseSuccess
 fun Application.configureUserRoutes(userService: UserService) {
     routing {
         authenticate {
+            get("/profile") {
+                val userId = call.principal<JWTPrincipal>()?.payload?.getClaim("id")?.asInt()
+                    ?: return@get call.responseError("Не авторизован", HttpStatusCode.Unauthorized)
+
+                val response = userService.read(userId)
+
+                System.out.println("DEBUG: Отправляем user: $response")
+                call.responseSuccess(response)
+            }
+
             get("/users") {
                 val users = userService.readAll()
-                call.responseSuccess(users)
+                val usersDto: List<ExposedUserDTO> = users.map { row ->
+                    ExposedUserDTO(
+                        id = row.id,
+                        name = row.name,
+                        email = row.email,
+                        phone = row.phone,
+                        role = row.role
+                    )
+                }
+                call.responseSuccess(usersDto)
             }
 
             get("/users/{id}") {
